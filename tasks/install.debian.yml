@@ -20,10 +20,12 @@
 - name: Add APT key (new GPG method)
   get_url:
     url: "{{ mongodb_apt_key_url[mongodb_major_version] if mongodb_apt_key_from_url|bool else omit }}"
-    dest: "/etc/apt/keyrings/mongodb-{{ mongodb_version }}-key.gpg"
-    mode: '0644'
-    force: true
+    dest: "/usr/share/keyrings/mongodb-{{ mongodb_version }}-key.asc"
   when: mongodb_package == 'mongodb-org'
+- name: Dearmor 'ascii-armored' key
+  become: true
+  shell: "curl {{ mongodb_apt_key_url[mongodb_major_version] if mongodb_apt_key_from_url|bool else omit }} | gpg -o /usr/share/keyrings/mongodb-{{ mongodb_version }}-key.gpg --dearmor"
+- apt: update_cache=yes
 
 # Fix Failed to update apt cache: unknown reason
 # https://github.com/ansible/ansible-modules-core/issues/2951#issuecomment-218327951
