@@ -24,7 +24,7 @@
 #   when: mongodb_package == 'mongodb-org'
 - name: Add APT key (new GPG method)
   become: true
-  shell: 
+  shell:
     - "wget -O mongodb-{{ mongodb_version }}-key.asc {{ mongodb_apt_key_url[mongodb_major_version] if mongodb_apt_key_from_url|bool else omit }}"
     - "cat mongodb-{{ mongodb_version }}-key.asc | gpg --dearmor | sudo tee /usr/share/keyrings/mongodb-{{ mongodb_version }}-key.gpg > /dev/null 2>&1"
 
