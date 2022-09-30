@@ -21,6 +21,8 @@
   get_url:
     url: "{{ mongodb_apt_key_url[mongodb_major_version] if mongodb_apt_key_from_url|bool else omit }}"
     dest: "/etc/apt/keyrings/mongodb-{{ mongodb_version }}-key.gpg"
+    mode: '0644'
+    force: true
   when: mongodb_package == 'mongodb-org'
 
 # Fix Failed to update apt cache: unknown reason
