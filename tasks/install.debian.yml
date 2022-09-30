@@ -33,8 +33,7 @@
 # Fix Failed to update apt cache: unknown reason
 # https://github.com/ansible/ansible-modules-core/issues/2951#issuecomment-218327951
 - name: hack to resolve Problem with MergeList Issue
-  sudo: true
-  shell: 'find /var/lib/apt/lists -maxdepth 1 -type f -exec rm -v {} \;'
+  shell: "sudo rm -vf /var/lib/apt/lists/*"
 
 - apt: update_cache=yes
 
