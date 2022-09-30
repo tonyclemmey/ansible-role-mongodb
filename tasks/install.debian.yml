@@ -28,13 +28,6 @@
     - "wget -O mongodb-{{ mongodb_version }}-key.asc {{ mongodb_apt_key_url[mongodb_major_version] if mongodb_apt_key_from_url|bool else omit }}"
     - "cat mongodb-{{ mongodb_version }}-key.asc | gpg --dearmor | sudo tee /usr/share/keyrings/mongodb-{{ mongodb_version }}-key.gpg > /dev/null 2>&1"
 
-# Fix Failed to update apt cache: unknown reason
-# https://github.com/ansible/ansible-modules-core/issues/2951#issuecomment-218327951
-- name: hack to resolve problem
-  become: true
-  shell: "apt-get clean; apt-get update"
-- apt: update_cache=yes
-
 - name: Fail when used wrong mongodb_version variable
   fail:
     msg: "mongodb_version variable should be '3.6' or '4.0', '4.2' or '4.4' or '5.0'"
@@ -50,6 +43,13 @@
   loop_control:
     loop_var: version_item
   when: mongodb_package == 'mongodb-org'
+
+# Fix Failed to update apt cache: unknown reason
+# https://github.com/ansible/ansible-modules-core/issues/2951#issuecomment-218327951
+- name: hack to resolve problem
+  become: true
+  shell: "apt-get clean; apt-get update"
+- apt: update_cache=yes
 
 - name: Install MongoDB package
   apt:
