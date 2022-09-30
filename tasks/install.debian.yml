@@ -9,19 +9,19 @@
     - mongodb_disable_transparent_hugepages | bool
     - ansible_service_mgr == "systemd"
 
-# - name: Add APT key
-#   apt_key:
-#     keyserver: "{{ mongodb_apt_keyserver if not mongodb_apt_key_from_url|bool else omit }}"
-#     url: "{{ mongodb_apt_key_url[mongodb_major_version] if mongodb_apt_key_from_url|bool else omit }}"
-#     id: "{{ mongodb_apt_key_id[mongodb_major_version] }}"
-#   when: mongodb_package == 'mongodb-org'
+- name: Add APT key
+  apt_key:
+    keyserver: "{{ mongodb_apt_keyserver if not mongodb_apt_key_from_url|bool else omit }}"
+    url: "{{ mongodb_apt_key_url[mongodb_major_version] if mongodb_apt_key_from_url|bool else omit }}"
+    id: "{{ mongodb_apt_key_id[mongodb_major_version] }}"
+  when: mongodb_package == 'mongodb-org'
 
 # Fix for Ubuntu 22.04
-- name: Add APT key (new GPG method)
-  get_url:
-    url: "{{ mongodb_apt_key_url[mongodb_major_version] if mongodb_apt_key_from_url|bool else omit }}"
-    dest: "/etc/apt/keyrings/mongodb-key.gpg"
-  when: mongodb_package == 'mongodb-org'
+# - name: Add APT key (new GPG method)
+#   get_url:
+#     url: "{{ mongodb_apt_key_url[mongodb_major_version] if mongodb_apt_key_from_url|bool else omit }}"
+#     dest: "/etc/apt/keyrings/mongodb-key.gpg"
+#   when: mongodb_package == 'mongodb-org'
 
 - name: Fail when used wrong mongodb_version variable
   fail:
@@ -33,7 +33,8 @@
 # Fix Failed to update apt cache: unknown reason
 # https://github.com/ansible/ansible-modules-core/issues/2951#issuecomment-218327951
 - name: hack to resolve problem
-  shell: "sudo apt-get clean;sudo apt-get update"
+  become: true
+  shell: "apt-get clean; apt-get update"
 
 - apt: update_cache=yes
 
